@@ -28,6 +28,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import PrintJSON from "@/components/custom/generic/print-json";
+import db from "@/server/db";
+import * as argon2 from "argon2";
+import { toast } from "react-toastify";
+import { AuthDTO, createAccount } from "./action";
 
 const authSchema = z
 	.object({
@@ -59,17 +63,10 @@ const authSchema = z
 			});
 		}
 	});
-type AuthDTO = {
-	name: string;
-	email: string;
-	password: string;
-	sendOnboardingEmail: boolean;
-};
 
 const AccountPage = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const columns = useMemo(() => getAccountColumns({}), []);
-	const [userCreatePassword, setUserCreatePassword] = useState<boolean>(false);
 
 	const form = useForm({
 		resolver: zodResolver(authSchema),
@@ -81,8 +78,22 @@ const AccountPage = () => {
 		},
 	});
 
-	const doSubmit = (values: AuthDTO) => {
-		console.log(values);
+	const doSubmit = async (values: AuthDTO) => {
+		let hashedPassword = null;
+		try {
+			const validated = authSchema.safeParse(values);
+			if (validated.error) {
+				// Validation Errors
+				throw new Error(validated.error.message);
+			}
+			await createAccount(validated.data as AuthDTO);
+
+			toast("User was added successfully");
+			form.reset();
+			setIsOpen(false);
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	return (
@@ -191,7 +202,7 @@ const AccountPage = () => {
 						</div>
 					</form>
 				</Form>
-				{/* <PrintJSON value={form.getValues()} /> */}
+				<PrintJSON value={form.getValues()} />
 			</SlideSheet>
 		</>
 	);
