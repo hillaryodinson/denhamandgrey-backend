@@ -1,18 +1,39 @@
 "use client";
 import DataTableColumnHeader from "@/components/custom/generic/datatable-column-header";
+import LogoutMenuItem from "@/components/custom/generic/logout-dropdown-menu-item";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { User } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
-import { CircleUser } from "lucide-react";
+import {
+	BanIcon,
+	CheckCircle2Icon,
+	CircleUser,
+	EllipsisVertical,
+	PenSquareIcon,
+	TrashIcon,
+} from "lucide-react";
 
 interface ColumnProps {
 	onEdit?: (user: User) => void;
 	onDelete?: (user: User) => void;
+	onBanned?: (user: User) => void;
+	onUnBanned?: (user: User) => void;
 }
 
 export const getAccountColumns = ({
 	onEdit,
 	onDelete,
+	onBanned,
+	onUnBanned,
 }: ColumnProps): ColumnDef<User>[] => [
 	{
 		id: "name",
@@ -33,12 +54,6 @@ export const getAccountColumns = ({
 			);
 		},
 	},
-	// {
-	// 	id: "name",
-	//
-	// 	accessorFn: (row) => `${row.name}`,
-	// 	accessorKey: "name",
-	// },
 	{
 		id: "email",
 		header: ({ column }) => {
@@ -57,5 +72,60 @@ export const getAccountColumns = ({
 		id: "action",
 		header: "",
 		size: 50,
+		cell: ({ row }) => {
+			const currentUser = row.original;
+			return onEdit || onDelete || onBanned || onUnBanned ? (
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant="ghost" size="icon" className="rounded-full">
+							<EllipsisVertical className="w-4 h-4" />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end">
+						{onEdit && (
+							<DropdownMenuItem
+								onClick={() => onEdit && onEdit(currentUser)}
+								className="flex items-center justify-normal">
+								<PenSquareIcon className="h-4 w-4 mr-2" />
+								<span>Edit</span>
+							</DropdownMenuItem>
+						)}
+						{onDelete && (
+							<>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem
+									onClick={() => onDelete && onDelete(currentUser)}
+									className="flex items-center justify-normal">
+									<TrashIcon className="h-4 w-4 mr-2" />
+									<span>Delete</span>
+								</DropdownMenuItem>
+							</>
+						)}
+						{onBanned && (
+							<>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem
+									onClick={() => onBanned && onBanned(currentUser)}
+									className="flex items-center justify-normal">
+									<BanIcon className="h-4 w-4 mr-2" />
+									<span>Ban Account</span>
+								</DropdownMenuItem>
+							</>
+						)}
+						{onUnBanned && (
+							<>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem
+									onClick={() => onUnBanned && onUnBanned(currentUser)}
+									className="flex items-center justify-normal">
+									<CheckCircle2Icon className="h-4 w-4 mr-2" />
+									<span>Restore Account</span>
+								</DropdownMenuItem>
+							</>
+						)}
+					</DropdownMenuContent>
+				</DropdownMenu>
+			) : null;
+		},
 	},
 ];

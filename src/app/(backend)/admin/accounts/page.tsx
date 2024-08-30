@@ -33,10 +33,11 @@ import { createAccount, fetchAccounts } from "./action";
 import { AuthDTO } from "@/types";
 import { authSchema } from "@/schema/validations/index.schema";
 import { useQuery, useQueryClient } from "react-query";
+import { User } from "@prisma/client";
 
 const AccountPage = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const columns = useMemo(() => getAccountColumns({}), []);
+
 	const queryClient = useQueryClient();
 	const form = useForm({
 		resolver: zodResolver(authSchema),
@@ -47,6 +48,10 @@ const AccountPage = () => {
 			sendOnboardingEmail: false,
 		},
 	});
+
+	const onEdit = (user: User) => {};
+	const onDelete = (User: User) => {};
+	const columns = useMemo(() => getAccountColumns({ onEdit, onDelete }), []);
 
 	const { data, isFetching } = useQuery({
 		queryKey: ["accounts"],
