@@ -1,28 +1,17 @@
 "use server";
-import db from "@/server/db";
+import { create } from "@/repository/user.repository";
+import { AuthDTO } from "@/types";
 import * as argon2 from "argon2";
 
-export type AuthDTO = {
-	name: string;
-	email: string;
-	password: string;
-	sendOnboardingEmail: boolean;
-};
-
-export const createAccount = async (data: AuthDTO) => {
+export const createAccount = async (record: AuthDTO) => {
 	let hashedPassword = null;
+	let data = { ...record };
+
 	if (!data.sendOnboardingEmail) {
-		hashedPassword = await argon2.hash(data.password!);
+		hashedPassword = await argon2.hash(record.password!);
+		data = { ...record, password: hashedPassword };
 	} else {
 		//TODO: send an email to user with first time password link
 	}
-
-	const user = await db.user.create({
-		data: {
-			email: data.email,
-			name: data.name,
-			password: hashedPassword,
-		},
-	});
-	return user;
+	return await create(data);
 };

@@ -28,41 +28,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import PrintJSON from "@/components/custom/generic/print-json";
-import db from "@/server/db";
-import * as argon2 from "argon2";
 import { toast } from "react-toastify";
-import { AuthDTO, createAccount } from "./action";
-
-const authSchema = z
-	.object({
-		name: z.string().min(1, "Name field is required"),
-		email: z
-			.string()
-			.min(1, "Email field is required")
-			.email("Please enter a valid email address"),
-		password: z.string().optional(),
-		sendOnboardingEmail: z.boolean(),
-	})
-	.superRefine((data, ctx) => {
-		if (data.sendOnboardingEmail !== true && !data.password) {
-			ctx.addIssue({
-				path: ["password"],
-				message: "Password is required and must be 6 characters or more",
-				code: "custom",
-			});
-		}
-		if (
-			data.sendOnboardingEmail !== true &&
-			data.password &&
-			data.password.length < 6
-		) {
-			ctx.addIssue({
-				path: ["password"],
-				message: "Password must be 6 characters or more",
-				code: "custom",
-			});
-		}
-	});
+import { createAccount } from "./action";
+import { AuthDTO } from "@/types";
+import { authSchema } from "@/schema/validations/index.schema";
 
 const AccountPage = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -79,7 +48,6 @@ const AccountPage = () => {
 	});
 
 	const doSubmit = async (values: AuthDTO) => {
-		let hashedPassword = null;
 		try {
 			const validated = authSchema.safeParse(values);
 			if (validated.error) {
@@ -88,10 +56,12 @@ const AccountPage = () => {
 			}
 			await createAccount(validated.data as AuthDTO);
 
-			toast("User was added successfully");
+			toast("User was added successfully", { type: "success" });
 			form.reset();
+
 			setIsOpen(false);
 		} catch (error) {
+			toast("An error occured user was not created", { type: "error" });
 			console.log(error);
 		}
 	};

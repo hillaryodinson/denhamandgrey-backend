@@ -1,7 +1,16 @@
 import db from "@/server/db";
+import { AuthDTO } from "@/types";
 import { User } from "@prisma/client";
 
-export const create = (id: string) => {};
+export const create = async (data: AuthDTO) => {
+	return await db.user.create({
+		data: {
+			email: data.email,
+			name: data.name,
+			password: data.password,
+		},
+	});
+};
 export const update = (id: string, data: {}) => {};
 export const remove = (id: { id: string }) => {};
 
