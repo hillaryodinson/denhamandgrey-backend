@@ -112,7 +112,7 @@ async function AdminNavbar() {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="secondary" size="icon" className="rounded-full">
-							<Avatar>
+							<Avatar className="rounded-full">
 								<AvatarImage
 									src={session?.user?.image || undefined}
 									alt="@avatar"

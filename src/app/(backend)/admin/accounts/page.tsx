@@ -29,14 +29,15 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import PrintJSON from "@/components/custom/generic/print-json";
 import { toast } from "react-toastify";
-import { createAccount } from "./action";
+import { createAccount, fetchAccounts } from "./action";
 import { AuthDTO } from "@/types";
 import { authSchema } from "@/schema/validations/index.schema";
+import { useQuery, useQueryClient } from "react-query";
 
 const AccountPage = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const columns = useMemo(() => getAccountColumns({}), []);
-
+	const queryClient = useQueryClient();
 	const form = useForm({
 		resolver: zodResolver(authSchema),
 		defaultValues: {
@@ -45,6 +46,11 @@ const AccountPage = () => {
 			password: "",
 			sendOnboardingEmail: false,
 		},
+	});
+
+	const { data, isFetching } = useQuery({
+		queryKey: ["accounts"],
+		queryFn: () => fetchAccounts(),
 	});
 
 	const doSubmit = async (values: AuthDTO) => {
@@ -57,8 +63,8 @@ const AccountPage = () => {
 			await createAccount(validated.data as AuthDTO);
 
 			toast("User was added successfully", { type: "success" });
+			queryClient.invalidateQueries();
 			form.reset();
-
 			setIsOpen(false);
 		} catch (error) {
 			toast("An error occured user was not created", { type: "error" });
@@ -82,7 +88,12 @@ const AccountPage = () => {
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="grid gap-4">
-					<DataTable columns={columns} data={[]} />
+					<DataTable
+						columns={columns}
+						data={data ?? []}
+						isFetching={isFetching}
+					/>
+					{/* <PrintJSON value={data} /> */}
 				</CardContent>
 			</Card>
 			<SlideSheet isOpen={isOpen} toggleOpen={setIsOpen}>
@@ -172,7 +183,6 @@ const AccountPage = () => {
 						</div>
 					</form>
 				</Form>
-				<PrintJSON value={form.getValues()} />
 			</SlideSheet>
 		</>
 	);

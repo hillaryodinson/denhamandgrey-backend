@@ -26,3 +26,11 @@ export const fetch = async (id: string): Promise<User | null> => {
 		},
 	});
 };
+
+/**
+ * Fetch all accounts in the database
+ * @returns User[]
+ */
+export const fetchAll = async (): Promise<User[]> => {
+	return await db.user.findMany();
+};
