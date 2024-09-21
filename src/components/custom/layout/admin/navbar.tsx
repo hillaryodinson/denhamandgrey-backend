@@ -48,7 +48,7 @@ async function AdminNavbar() {
 	];
 	console.log(session);
 	return (
-		<header className="sticky top-0 z-[100] flex h-16 items-center gap-4 border-b bg-white/75 px-4 backdrop-blur-lg md:px-6">
+		<header className="sticky top-0 z-[49] flex h-16 items-center gap-4 border-b bg-white/75 px-4 backdrop-blur-lg md:px-6">
 			<nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
 				<Link
 					href="#"
@@ -112,7 +112,7 @@ async function AdminNavbar() {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="secondary" size="icon" className="rounded-full">
-							<Avatar className="rounded-full">
+							<Avatar className="rounded-full overflow-hidden border-slate-500 border-2">
 								<AvatarImage
 									src={session?.user?.image || undefined}
 									alt="@avatar"

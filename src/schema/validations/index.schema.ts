@@ -1,3 +1,4 @@
+import { platform } from "os";
 import { z } from "zod";
 
 export const LoginSchema = z.object({
@@ -35,3 +36,22 @@ export const authSchema = z
 			});
 		}
 	});
+
+export const socialSchema = z.object({
+	platform: z
+		.string()
+		.min(1, { message: "Please select a social media platform" }),
+	url: z.string().url({ message: "Please enter a valid url" }),
+	membersId: z.string().nullable(),
+	id: z.string().default(""),
+});
+
+export const memberSchema = z.object({
+	id: z.string().nullable(),
+	name: z.string(),
+	position: z.string(),
+	photo: z.string(),
+	description: z.string(),
+	type: z.string(),
+	socials: z.array(socialSchema),
+});

@@ -70,3 +70,48 @@ model VerificationToken {
 
   @@id([identifier, token])
 }
+
+model Faq {
+  id       String @id @default(cuid())
+  question String
+  answer   String
+}
+
+model Service {
+  id    String @id @default(cuid())
+  title String
+  body  String
+  image String
+}
+
+enum MemberType {
+  management
+  board
+}
+
+model Member {
+  id          String              @id @default(cuid())
+  name        String
+  position    String
+  photo       String
+  description String
+  type        MemberType          @default(management)
+  socials     MemberSocialLinks[]
+}
+
+model MemberSocialLinks {
+  id        String  @id @default(cuid())
+  platform  String //social media platform name
+  url       String
+  membersId String?
+  Members   Member? @relation(fields: [membersId], references: [id])
+}
+
+model Page {
+  id    String @id @default(cuid())
+  title String
+  name  String
+  slug  String
+  url   String
+  body  String
+}

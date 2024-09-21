@@ -98,7 +98,6 @@ const AccountPage = () => {
 						data={data ?? []}
 						isFetching={isFetching}
 					/>
-					{/* <PrintJSON value={data} /> */}
 				</CardContent>
 			</Card>
 			<SlideSheet isOpen={isOpen} toggleOpen={setIsOpen}>
